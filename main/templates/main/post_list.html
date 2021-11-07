@@ -1,0 +1,54 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block header %}
+{{ block.super }}
+<div class="header-tabs">
+    <div class="tabs tabs--2">
+        <div class="tab{% if 'follow' not in request.GET %} tab--active{% endif %}">
+            <a href="{% url 'home' %}" class="tab__link">
+                <span class="tab__label">latest</span>
+            </a>
+        </div>
+        <div class="tab{% if 'follow' in request.GET %} tab--active{% endif %}">
+            <a href="{% url 'home' %}?follow" class="tab__link">
+                <span class="tab__label">follow</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<ul class="post-list">
+    {% for post in object_list %}
+    <li class="post-list__item">
+        <div class="post-list__image">
+            <img src="{{ post.img.url }}">
+            <a role="button">
+                <i class="fas fa-ellipsis-h"></i>
+                <div class="action-menu">
+                    <ul class="action-list">
+                        <li class="action-list__item">
+                            {% if post.user == user %}
+                            <span role="button" data-action="">削除</span>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+            </a>
+        </div>
+        <div class="post-list__actions">
+            <div class="post-list__like"></div>
+        </div>
+        <div class="post-list__body">
+            {{ post.note }}
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'main/js/action-menu.js' %}"></script>
+{% endblock %}

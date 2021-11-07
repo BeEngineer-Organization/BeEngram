@@ -20,17 +20,17 @@ from .tokens import account_activation_token
 User = get_user_model()
 
 
-class IndexView(LoginRequiredMixin, ListView):
+class PostListView(LoginRequiredMixin, ListView):
     model = Post
     ordering = ("-post_date",)
-    template_name = "main/index.html"
     paginate_by = 20
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related("user")
         if "follow" in self.request.GET:
             queryset = queryset.filter(
-                Q(user=self.request.user) | Q(user__in=self.request.user.follow.all())
+                Q(user=self.request.user)
+                | Q(user__in=self.request.user.follow.all())
             )
         return queryset
 
@@ -41,8 +41,8 @@ class SignUpView(CreateView):
     form_class = SignUpForm
 
     def form_valid(self, form):
-        result = super().form_valid(form)
         user = form.save(commit=False)
+        self.object = user
         user.is_active = False
         user.save()
         current_site = get_current_site(self.request)
@@ -59,7 +59,7 @@ class SignUpView(CreateView):
         to_email = form.cleaned_data.get("email")
         email = EmailMessage(mail_subject, message, to=[to_email])
         email.send()
-        return result
+        return HttpResponseRedirect(self.get_success_url())
 
 
 def activate(request, uidb64, token):
@@ -72,7 +72,7 @@ def activate(request, uidb64, token):
         user.is_active = True
         user.save()
         login(request, user)
-        return redirect("index")
+        return redirect("home")
     else:
         return HttpResponse("このリンクは無効です。申し訳ありませんが、もう一度登録の処理をやり直してください。")
 
@@ -80,7 +80,7 @@ def activate(request, uidb64, token):
 class PostView(LoginRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
-    success_url = reverse_lazy("index")
+    success_url = reverse_lazy("home")
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -95,30 +95,16 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
     form_class = ProfileEditForm
     success_url = reverse_lazy("settings")
 
-    def get_initial(self):
-        initial = super().get_initial()
-        initial["icon"] = self.request.user.icon
-        initial["username"] = self.request.user.username
-        initial["profile"] = self.request.user.profile
-        return initial
+    def get_object(self, queryset=None):
+        return self.request.user
 
 
 class ProfileView(LoginRequiredMixin, DetailView):
     model = User
 
-    def get(self, request, *args, **kwargs):
-        target_user = (
-            User.objects.filter(pk=kwargs["pk"])
-            .prefetch_related(
-                "posts",
-                "like",
-            )
-            .annotate(
-                Count("posts"),
-                Count("follow"),
-                Count("followed"),
-            )
+    def get_queryset(self):
+        return User.objects.prefetch_related("posts", "like").annotate(
+            Count("posts"),
+            Count("follow"),
+            Count("followed"),
         )
-        self.object = self.get_object(target_user)
-        context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
