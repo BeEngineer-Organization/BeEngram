@@ -2,17 +2,16 @@ from django.contrib.auth import get_user_model, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
-
+from django.views.generic.list import ListView
 
 from .forms import PostForm, ProfileEditForm, SignUpForm
 from .models import Post
@@ -21,8 +20,19 @@ from .tokens import account_activation_token
 User = get_user_model()
 
 
-class IndexView(LoginRequiredMixin, TemplateView):
+class IndexView(LoginRequiredMixin, ListView):
+    model = Post
+    ordering = ("-post_date",)
     template_name = "main/index.html"
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related("user")
+        if "follow" in self.request.GET:
+            queryset = queryset.filter(
+                Q(user=self.request.user) | Q(user__in=self.request.user.follow.all())
+            )
+        return queryset
 
 
 class SignUpView(CreateView):
@@ -37,12 +47,15 @@ class SignUpView(CreateView):
         user.save()
         current_site = get_current_site(self.request)
         mail_subject = "[BeEngram] アカウントを有効化してください"
-        message = render_to_string("registration/signup_email.html", {
-            "user": user,
-            "domain": current_site.domain,
-            "uid":urlsafe_base64_encode(force_bytes(user.pk)),
-            "token":account_activation_token.make_token(user),
-        })
+        message = render_to_string(
+            "registration/signup_email.html",
+            {
+                "user": user,
+                "domain": current_site.domain,
+                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                "token": account_activation_token.make_token(user),
+            },
+        )
         to_email = form.cleaned_data.get("email")
         email = EmailMessage(mail_subject, message, to=[to_email])
         email.send()
@@ -94,13 +107,17 @@ class ProfileView(LoginRequiredMixin, DetailView):
     model = User
 
     def get(self, request, *args, **kwargs):
-        target_user = User.objects.filter(pk=kwargs["pk"]).prefetch_related(
-            "posts",
-            "like",
-        ).annotate(
-            Count("posts"),
-            Count("follow"),
-            Count("followed"),
+        target_user = (
+            User.objects.filter(pk=kwargs["pk"])
+            .prefetch_related(
+                "posts",
+                "like",
+            )
+            .annotate(
+                Count("posts"),
+                Count("follow"),
+                Count("followed"),
+            )
         )
         self.object = self.get_object(target_user)
         context = self.get_context_data(object=self.object)
