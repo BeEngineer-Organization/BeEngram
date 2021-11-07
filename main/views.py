@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
+from django.db.models import Count
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
@@ -9,7 +10,9 @@ from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.generic.base import TemplateView
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
+
 
 from .forms import PostForm, ProfileEditForm, SignUpForm
 from .models import Post
@@ -85,3 +88,20 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
         initial["username"] = self.request.user.username
         initial["profile"] = self.request.user.profile
         return initial
+
+
+class ProfileView(LoginRequiredMixin, DetailView):
+    model = User
+
+    def get(self, request, *args, **kwargs):
+        target_user = User.objects.filter(pk=kwargs["pk"]).prefetch_related(
+            "posts",
+            "like",
+        ).annotate(
+            Count("posts"),
+            Count("follow"),
+            Count("followed"),
+        )
+        self.object = self.get_object(target_user)
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
