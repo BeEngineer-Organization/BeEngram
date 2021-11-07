@@ -1,0 +1,33 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block header %}{% include "main/header.html" with title="profile" %}{% endblock %}
+
+{% block content %}
+<form method="post" class="form" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-field form-field--image">
+        {{ form.img }}
+        <label for="{{ form.img.id_for_label }}">
+            <img src="https://dummyimage.com/600x400/888888/ffffff">
+        </label>
+        {% if form.img.errors %}
+        <ul class="form-field__errors">
+            {% for err in form.img.errors %}
+            <li>{{ err }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    <div class="form-field">
+        {{ form.note }}
+    </div>
+    <div class="form-field form-field--submit">
+        <button type="submit" class="round-button">投稿</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'main/js/form-image.js' %}"></script>
+{% endblock %}

@@ -26,6 +26,6 @@ class ProfileEditForm(forms.ModelForm):
         model = User
         fields = ('icon', 'username', 'profile')
         widgets = {
-            "icon": forms.FileInput(attrs={"accept": "image/jpeg,image/png", "data-form-image": True}),
+            "icon": forms.FileInput(attrs={"accept": "image/jpeg,image/png"}),
         }
 

@@ -23,8 +23,8 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
 
 class SignUpView(CreateView):
-    template_name = 'registration/signup.html'
-    success_url = reverse_lazy('signup_email_send')
+    template_name = "registration/signup.html"
+    success_url = reverse_lazy("signup_email_send")
     form_class = SignUpForm
 
     def form_valid(self, form):
@@ -33,14 +33,14 @@ class SignUpView(CreateView):
         user.is_active = False
         user.save()
         current_site = get_current_site(self.request)
-        mail_subject = '[BeEngram] アカウントを有効化してください'
-        message = render_to_string('registration/signup_email.html', {
-            'user': user,
-            'domain': current_site.domain,
-            'uid':urlsafe_base64_encode(force_bytes(user.pk)),
-            'token':account_activation_token.make_token(user),
+        mail_subject = "[BeEngram] アカウントを有効化してください"
+        message = render_to_string("registration/signup_email.html", {
+            "user": user,
+            "domain": current_site.domain,
+            "uid":urlsafe_base64_encode(force_bytes(user.pk)),
+            "token":account_activation_token.make_token(user),
         })
-        to_email = form.cleaned_data.get('email')
+        to_email = form.cleaned_data.get("email")
         email = EmailMessage(mail_subject, message, to=[to_email])
         email.send()
         return result
@@ -74,14 +74,14 @@ class PostView(LoginRequiredMixin, CreateView):
 
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
-    template_name = 'main/edit_profile.html'
+    template_name = "main/edit_profile.html"
     model = User
     form_class = ProfileEditForm
-    success_url = reverse_lazy('settings')
+    success_url = reverse_lazy("settings")
 
     def get_initial(self):
         initial = super().get_initial()
-        initial['icon'] = self.request.user.icon
-        initial['username'] = self.request.user.username
-        initial['profile'] = self.request.user.profile
+        initial["icon"] = self.request.user.icon
+        initial["username"] = self.request.user.username
+        initial["profile"] = self.request.user.profile
         return initial
