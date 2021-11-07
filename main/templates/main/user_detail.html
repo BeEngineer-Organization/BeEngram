@@ -1,0 +1,38 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block header %}{% include "main/header.html" with title="profile" %}{% endblock %}
+
+{% block content %}
+<div>
+    <div><img src="{{ user.icon.url }}"></div>
+    <div>{{ user.posts__count }}</div>
+    <div>{{ user.follow__count }}</div>
+    <div>{{ user.followed__count }}</div>
+</div>
+<div>{{ user.username }}</div>
+<div><a href="{% url 'settings' %}"><i class="fas fa-cog"></i></a></div>
+<div>{{ user.profile }}</div>
+
+<div>
+    <ul>
+        <li><i class="fas fa-clone"></i><br>my post</li>
+        <li><i class="fas fa-heart"></i><br>like</li>
+    </ul>
+</div>
+<div>
+{% for my_post in user.posts.all %}
+<img src="{{ my_post.img.url }}">
+{% endfor %}
+</div>
+<div>
+{% for liked_post in user.like.all %}
+<img src="{{ liked_post.img.url }}">
+{% endfor %}
+</div>
+{% endblock %}
+
+{% block footer %}{% include "main/footer.html" with current="profile" %}{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

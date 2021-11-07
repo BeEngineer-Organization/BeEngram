@@ -12,7 +12,7 @@
         </a>
     </div>
     <div class="footer-tab{% if current == 'profile' %} footer-tab--active{% endif %}">
-        <a href="" class="footer-tab__link">
+        <a href="{% url 'profile' user.pk %}" class="footer-tab__link">
             <span class="footer-tab__icon"><i class="fas fa-user"></i></span>
             <span class="footer-tab__label">profile</span>
         </a>

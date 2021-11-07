@@ -1,6 +1,10 @@
 {% extends "main/base.html" %}
+
 {% block header %}{% include "main/header.html" with title="settings" %}{% endblock %}
+
 {% block content %}
 <a href="{% url 'edit_profile' user.pk %}">プロフィール編集</a>
 <a href="{% url 'logout' %}">ログアウト</a>
 {% endblock %}
+
+{% block footer %}{% include "main/footer.html" with current="profile" %}{% endblock %}
