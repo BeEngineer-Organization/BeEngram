@@ -1,0 +1,30 @@
+{% extends "main/base.html" %}
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {% for field in form %}
+    {% if field.name == "icon" %}
+    <div class="form-field form-field--image">
+        {{ field }}
+        <label for="{{ field.id_for_label }}">
+            <img src="{{ field.value.url }}" alt="{{ field.value.url }}">
+        </label>
+        {% if field.errors %}
+        <ul class="form-field__errors">
+            {% for err in field.errors %}
+            <li>{{ err }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="form-field">
+        {{ field.label_tag }}
+        {{ field }}
+    </div>
+    {% endif %}
+    {% endfor %}
+    <div class="form-field form-field--submit">
+        <button type="submit">保存</button>
+    </div>
+{% endblock %}
