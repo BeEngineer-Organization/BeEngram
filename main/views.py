@@ -1,25 +1,25 @@
+from django.contrib.auth import get_user_model, login
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
-from django.contrib.auth import login
 from django.core.mail import EmailMessage
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
-from django.utils.encoding import force_bytes, force_str
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.urls import reverse_lazy
-from django.views.generic import TemplateView
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView
 
-from .models import User, Post, Comment
+from .forms import LoginForm, PostForm, SignUpForm
+from .models import Comment, Post
 from .tokens import account_activation_token
-from .forms import (
-    SignUpForm,
-    LoginForm,
-)
 
-class IndexView(TemplateView):
+User = get_user_model()
+
+
+class IndexView(LoginRequiredMixin, TemplateView):
     template_name = "main/index.html"
-
 
 
 class SignUpView(CreateView):
@@ -50,7 +50,7 @@ def activate(request, uidb64, token):
     try:
         uid = force_str(urlsafe_base64_decode(uidb64))
         user = User.objects.get(pk=uid)
-    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
         user = None
     if user is not None and account_activation_token.check_token(user, token):
         user.is_active = True
@@ -58,4 +58,16 @@ def activate(request, uidb64, token):
         login(request, user)
         return redirect("index")
     else:
-        return HttpResponse('このリンクは無効です。申し訳ありませんが、もう一度登録の処理をやり直してください。')
+        return HttpResponse("このリンクは無効です。申し訳ありませんが、もう一度登録の処理をやり直してください。")
+
+
+class PostView(LoginRequiredMixin, CreateView):
+    model = Post
+    form_class = PostForm
+    success_url = reverse_lazy("index")
+
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.user = self.request.user
+        self.object.save()
+        return HttpResponseRedirect(self.get_success_url())
