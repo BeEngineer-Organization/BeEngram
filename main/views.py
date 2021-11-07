@@ -8,6 +8,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.urls import reverse_lazy
 from django.views.generic import TemplateView
+from django.views.generic.edit import CreateView
 
 from .models import User, Post, Comment
 from .tokens import account_activation_token
@@ -20,7 +21,6 @@ class IndexView(TemplateView):
     template_name = "main/index.html"
 
 
-from django.views.generic.edit import CreateView
 
 class SignUpView(CreateView):
     template_name = 'registration/signup.html'
