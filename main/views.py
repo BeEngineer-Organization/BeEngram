@@ -12,7 +12,6 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView
-from django.views.generic.list import ListView
 
 
 from .forms import PostForm, ProfileEditForm, SignUpForm
@@ -106,13 +105,3 @@ class ProfileView(LoginRequiredMixin, DetailView):
         self.object = self.get_object(target_user)
         context = self.get_context_data(object=self.object)
         return self.render_to_response(context)
-
-
-class FollowListView(LoginRequiredMixin, ListView):
-    template_name = 'main/follow_list.html'
-    model = User
-
-
-class FollowedListView(LoginRequiredMixin, ListView):
-    template_name = 'main/followed_list.html'
-    model = User

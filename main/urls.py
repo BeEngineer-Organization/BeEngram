@@ -15,7 +15,5 @@ urlpatterns = [
     path("activate/<uidb64>/<token>/", views.activate, name="activate"),
     path("post/", views.PostView.as_view(), name="new_post"),
     path("profile/<int:pk>", views.ProfileView.as_view(), name="profile"),
-    path("profile/follow/<int:pk>", views.FollowListView.as_view(), name="follow_list"),
-    path("profile/followed/<int:pk>", views.FollowedListView.as_view(), name="followed_list"),
     path("edit_profile/<int:pk>", views.ProfileEditView.as_view(), name="edit_profile"),
 ]
