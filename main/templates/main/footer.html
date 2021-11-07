@@ -5,22 +5,24 @@
 {% endif %}
 
 <footer id="footer" class="footer">
-    <div class="footer-tab{% if current|default:'home' == 'home' %} footer-tab--active{% endif %}">
-        <a href="{% url 'index' %}" class="footer-tab__link">
-            <span class="footer-tab__icon"><i class="fas fa-home"></i></span>
-            <span class="footer-tab__label">home</span>
-        </a>
-    </div>
-    <div class="footer-tab{% if current == 'profile' %} footer-tab--active{% endif %}">
-        <a href="{% url 'profile' user.pk %}" class="footer-tab__link">
-            <span class="footer-tab__icon"><i class="fas fa-user"></i></span>
-            <span class="footer-tab__label">profile</span>
-        </a>
-    </div>
-    <div class="footer-tab{% if current == 'search' %} footer-tab--active{% endif %}">
-        <a href="" class="footer-tab__link">
-            <span class="footer-tab__icon"><i class="fas fa-search"></i></span>
-            <span class="footer-tab__label">search</span>
-        </a>
+    <div class="tabs tabs--3">
+        <div class="tab{% if current|default:'home' == 'home' %} tab--active{% endif %}">
+            <a href="{% url 'index' %}" class="tab__link">
+                <span class="tab__icon"><i class="fas fa-home"></i></span>
+                <span class="tab__label">home</span>
+            </a>
+        </div>
+        <div class="tab{% if current == 'profile' %} tab--active{% endif %}">
+            <a href="{% url 'profile' user.pk %}" class="tab__link">
+                <span class="tab__icon"><i class="fas fa-user"></i></span>
+                <span class="tab__label">profile</span>
+            </a>
+        </div>
+        <div class="tab{% if current == 'search' %} tab--active{% endif %}">
+            <a href="" class="tab__link">
+                <span class="tab__icon"><i class="fas fa-search"></i></span>
+                <span class="tab__label">search</span>
+            </a>
+        </div>
     </div>
 </footer>
