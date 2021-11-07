@@ -9,10 +9,10 @@ from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import CreateView
+from django.views.generic.edit import CreateView, UpdateView
 
-from .forms import LoginForm, PostForm, SignUpForm
-from .models import Comment, Post
+from .forms import PostForm, ProfileEditForm, SignUpForm
+from .models import Post
 from .tokens import account_activation_token
 
 User = get_user_model()
@@ -23,8 +23,8 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
 
 class SignUpView(CreateView):
-    template_name = 'registration/signup.html'
-    success_url = reverse_lazy('signup_email_send')
+    template_name = "registration/signup.html"
+    success_url = reverse_lazy("signup_email_send")
     form_class = SignUpForm
 
     def form_valid(self, form):
@@ -33,14 +33,14 @@ class SignUpView(CreateView):
         user.is_active = False
         user.save()
         current_site = get_current_site(self.request)
-        mail_subject = '[BeEngram] アカウントを有効化してください'
-        message = render_to_string('registration/signup_email.html', {
-            'user': user,
-            'domain': current_site.domain,
-            'uid':urlsafe_base64_encode(force_bytes(user.pk)),
-            'token':account_activation_token.make_token(user),
+        mail_subject = "[BeEngram] アカウントを有効化してください"
+        message = render_to_string("registration/signup_email.html", {
+            "user": user,
+            "domain": current_site.domain,
+            "uid":urlsafe_base64_encode(force_bytes(user.pk)),
+            "token":account_activation_token.make_token(user),
         })
-        to_email = form.cleaned_data.get('email')
+        to_email = form.cleaned_data.get("email")
         email = EmailMessage(mail_subject, message, to=[to_email])
         email.send()
         return result
@@ -71,3 +71,17 @@ class PostView(LoginRequiredMixin, CreateView):
         self.object.user = self.request.user
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
+
+
+class ProfileEditView(LoginRequiredMixin, UpdateView):
+    template_name = "main/edit_profile.html"
+    model = User
+    form_class = ProfileEditForm
+    success_url = reverse_lazy("settings")
+
+    def get_initial(self):
+        initial = super().get_initial()
+        initial["icon"] = self.request.user.icon
+        initial["username"] = self.request.user.username
+        initial["profile"] = self.request.user.profile
+        return initial

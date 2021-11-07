@@ -10,9 +10,6 @@ class SignUpForm(UserCreationForm):
         model = User
         fields = ('username', 'email', 'password1', 'password2')
 
-class LoginForm(AuthenticationForm):
-    pass
-
 
 class PostForm(forms.ModelForm):
     class Meta:
@@ -22,3 +19,13 @@ class PostForm(forms.ModelForm):
             "img": forms.FileInput(attrs={"accept": "image/jpeg,image/png", "data-form-image": True}),
             "note": forms.Textarea(attrs={"placeholder": "説明文", "rows": 7}),
         }
+
+
+class ProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('icon', 'username', 'profile')
+        widgets = {
+            "icon": forms.FileInput(attrs={"accept": "image/jpeg,image/png"}),
+        }
+
