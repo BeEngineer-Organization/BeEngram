@@ -1,0 +1,26 @@
+{% load static %}<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BeEngram</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+            integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer">
+        <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
+        {% block extra_style %}{% endblock %}
+    </head>
+    <body>
+        {# header #}
+        {% block header %}{% include "main/header.html" %}{% endblock %}
+
+        <main id="content">
+            {% block content %}{% endblock %}
+        </main>
+
+        {# footer #}
+        {% block footer %}{% include "main/footer.html" %}{% endblock %}
+
+        {% block extra_js %}{% endblock %}
+    </body>
+</html>

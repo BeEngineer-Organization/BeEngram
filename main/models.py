@@ -4,7 +4,7 @@ from django.db import models
 class User(AbstractUser):
     username = models.CharField(max_length=20, unique=True)
     profile = models.CharField(max_length=150)
-    follow = models.ManyToManyField("self", related_name='followed')
+    follow = models.ManyToManyField("User", related_name='followed')
     icon = models.ImageField(upload_to='icons/', blank=True)
     like = models.ManyToManyField("Post", related_name='liked_users')
 
