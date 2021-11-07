@@ -56,7 +56,7 @@ ROOT_URLCONF = 'beengram.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -127,3 +127,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "/media/"
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'y.tosa.kyoto@gmail.com'
+EMAIL_HOST_PASSWORD = 'cruzefhtivpgexjl'
+EMAIL_PORT = 587
+
+LOGIN_URL='login'
+LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL='top'
