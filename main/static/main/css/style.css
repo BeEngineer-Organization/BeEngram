@@ -73,6 +73,8 @@ body {
     line-height: 4;
     color: var(--black);
     background-color: var(--white);
+    text-decoration: none;
+    text-align: center;
 }
 
 .round-button:hover {
@@ -124,9 +126,21 @@ body {
     margin: 0 64px;
 }
 
+.form--center {
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 .form-field {
     width: 100%;
     margin: 32px 0;
+}
+
+.form--center .form-field {
+    margin: 16px 0;
 }
 
 .form-field--image {
@@ -163,6 +177,10 @@ body {
     flex-basis: 50%;
     margin: 8px;
     font-size: 0.8rem;
+}
+
+.form-field__errors {
+    margin: 0;
 }
 
 .post-list {
@@ -273,4 +291,16 @@ body {
 .action-list a {
     text-decoration: none;
     color: var(--black);
+}
+
+.index-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+    margin: 0 32px;
+}
+
+.index-buttons .round-button {
+    margin: 32px 0;
 }
