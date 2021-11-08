@@ -229,5 +229,4 @@ class SearchView(LoginRequiredMixin, ListView):
             context["form"] = SearchForm(self.request.GET)
         else:
             context["form"] = SearchForm()
-        print(self.request.session)
         return context
