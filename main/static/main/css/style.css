@@ -73,6 +73,8 @@ body {
     line-height: 4;
     color: var(--black);
     background-color: var(--white);
+    text-decoration: none;
+    text-align: center;
 }
 
 .round-button:hover {
@@ -289,4 +291,16 @@ body {
 .action-list a {
     text-decoration: none;
     color: var(--black);
+}
+
+.index-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+    margin: 0 32px;
+}
+
+.index-buttons .round-button {
+    margin: 32px 0;
 }
