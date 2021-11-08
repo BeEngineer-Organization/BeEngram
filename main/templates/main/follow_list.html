@@ -1,0 +1,57 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block header %}
+{{ block.super }}
+<div class="header-tabs">
+    <div class="tabs tabs--2">
+        <div class="tab{% if 'followed' not in request.GET %} tab--active{% endif %}">
+            <a href="{% url 'follow_list' user_id %}" class="tab__link">
+                <span class="tab__label">フォロー</span>
+            </a>
+        </div>
+        <div class="tab{% if 'followed' in request.GET %} tab--active{% endif %}">
+            <a href="{% url 'follow_list' user_id %}?followed" class="tab__link">
+                <span class="tab__label">フォロワー</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<ul class="follow-list">
+    {% for user in object_list %}
+    <li class="follow-list__item">
+        <div class="follow-list__image">
+            {% if user.icon %}
+            <img src="{{user.icon.url}}" alt="ユーザーアイコン">
+            {% else %}
+            <img src="/static/main/img/noimage.png" alt="ユーザーアイコン">
+            {% endif %}
+        </div>
+        <div class="follow-list__username">
+            <a href="{% url 'profile' user.pk %}">{{user.username}}</a>
+        </div>
+        {% if user.pk is not request.user.pk  %}
+        <div class="follow-list__is-follow">
+            <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="target" value="{{ user.pk }}">
+            {% if user.is_follow %}
+            <button type="submit" name="unfollow">フォロー中</button>
+            {% else %}
+            <button type="submit" name="follow">フォロー</button>
+            {% endif %}
+            </form>
+        </div>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
+{% block footer %}{% include "main/footer.html" with current="profile" %}{% endblock %}
+
+{% block extra_js %}
+{% endblock %}

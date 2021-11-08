@@ -5,10 +5,16 @@
 
 {% block content %}
 <div>
-    <div><img src="{{ user.icon.url }}"></div>
+    <div>
+        {% if user.icon %}
+        <img src="{{ user.icon.url }}" alt="ユーザーアイコン">
+        {% else %}
+        <img src="/static/main/img/noimage.png" alt="ユーザーアイコン">
+        {% endif %}
+    </div>
     <div>{{ user.posts__count }}</div>
-    <div>{{ user.follow__count }}</div>
-    <div>{{ user.followed__count }}</div>
+    <div><a href="{% url 'follow_list' user.pk %}">{{ user.follow__count }}</a></div>
+    <div><a href="{% url 'follow_list' user.pk %}?followed">{{ user.followed__count }}</a></div>
 </div>
 <div>{{ user.username }}</div>
 <div><a href="{% url 'settings' %}"><i class="fas fa-cog"></i></a></div>

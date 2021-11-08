@@ -1,12 +1,16 @@
+from urllib.parse import urlencode
+
 from django.contrib.auth import get_user_model, login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
-from django.db.models import Count, Q
+from django.db.models import Case, Count, Q, Value, When
+from django.db.models.query import QuerySet
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.generic.detail import DetailView
@@ -102,9 +106,60 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
 class ProfileView(LoginRequiredMixin, DetailView):
     model = User
 
-    def get_queryset(self):
-        return User.objects.prefetch_related("posts", "like").annotate(
-            Count("posts"),
-            Count("follow"),
-            Count("followed"),
+    def get(self, request, *args, **kwargs):
+        self.queryset = User.objects.filter(pk=kwargs["pk"]).prefetch_related("posts", "like").annotate(
+            Count("posts", distinct=True),
+            Count("follow", distinct=True),
+            Count("followed", distinct=True),
         )
+        return super().get(self, request, *args, **kwargs)
+
+
+class FollowListView(LoginRequiredMixin, ListView):
+    model = User
+    template_name = "main/follow_list.html"
+    paginate_by = 20
+    
+    def get(self, request, *args, **kwargs):
+        self.user_id = kwargs["pk"]
+        user = get_object_or_404(User, pk=kwargs["pk"])
+        follow_list = user.follow.all()
+        if "followed" in self.request.GET:
+            self.queryset = (
+                user.followed
+                .annotate(
+                    is_follow=Case(
+                        When(followed__id__contains=request.user.pk, then=True),
+                        default=False
+                    )
+                )
+            )
+        else:
+            self.queryset = (
+                follow_list
+                .annotate(
+                    is_follow=Case(
+                        When(followed__id__contains=request.user.pk, then=True),
+                        default=False
+                    )
+                )
+            )
+
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        target = get_object_or_404(User, pk=request.POST["target"])
+        if "follow" in request.POST:
+            user.follow.add(target)
+            user.save()
+        elif "unfollow" in request.POST:
+            user.follow.remove(target)
+            user.save()
+        return self.get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_id"] = self.user_id
+        return context
+
