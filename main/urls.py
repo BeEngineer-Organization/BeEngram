@@ -25,10 +25,12 @@ urlpatterns = [
         name="signup_email_send",
     ),
     path("activate/<uidb64>/<token>/", views.activate, name="activate"),
+    path("post/<pk>", views.PostDetailView.as_view(), name="post_detail"),
     path("post/", views.PostView.as_view(), name="new_post"),
     path(
         "delete_post/<pk>", views.PostDeleteView.as_view(), name="delete_post"
     ),
+    path("comment/<post_pk>/", views.CommentView.as_view(), name="comment"),
     path("profile/<int:pk>", views.ProfileView.as_view(), name="profile"),
     path(
         "edit_profile/<int:pk>",

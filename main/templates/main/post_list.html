@@ -23,26 +23,41 @@
 <ul class="post-list">
     {% for post in object_list %}
     <li class="post-list__item">
-        <div class="post-list__image">
-            <img src="{{ post.img.url }}">
-            <div class="menu-button" role="button">
-                <i class="fas fa-ellipsis-h"></i>
-                <div class="action-menu">
-                    <ul class="action-list">
-                        <li class="action-list__item">
-                            {% if post.user == user %}
-                            <a href="{% url 'delete_post' post.pk %}">削除</a>
-                            {% endif %}
-                        </li>
-                    </ul>
+        <div class="post">
+            <div class="post__image">
+                <a href="{% url 'post_detail' post.pk %}">
+                    <img src="{{ post.img.url }}">
+                </a>
+                <div class="menu-button" role="button">
+                    <i class="fas fa-ellipsis-h"></i>
+                    <div class="action-menu">
+                        <ul class="action-list">
+                            <li class="action-list__item">
+                                {% if post.user == user %}
+                                <a href="{% url 'delete_post' post.pk %}">削除</a>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="post-list__actions">
-            <div class="post-list__like"></div>
-        </div>
-        <div class="post-list__body">
-            {{ post.note }}
+            <div class="post__actions">
+                <div class="post__like">
+                    <a class="like{% if post in user.like.all %} like--active{% endif %}"><i class="fas fa-heart"></i></a>
+                </div>
+                <div class="post__comment">
+                    <a href="{% url 'comment' post.pk %}" class="comment"><i class="fas fa-comment"></i></a>
+                </div>
+                <div class="post__user">
+                    <a href="{% url 'profile' post.user.pk %}" class="user">
+                        <img src="{{ post.user.icon.url }}">
+                        <span>{{ post.user.username }}</span>
+                    </a>
+                </div>
+            </div>
+            <div class="post__body">
+                {{ post.note }}
+            </div>
         </div>
     </li>
     {% endfor %}

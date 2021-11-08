@@ -14,7 +14,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
 from .forms import ConfirmForm, PostForm, ProfileEditForm, SignUpForm
-from .models import Post
+from .models import Comment, Post
 from .tokens import account_activation_token
 
 User = get_user_model()
@@ -96,6 +96,22 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return super().get_queryset().filter(user=self.request.user)
+
+
+class PostDetailView(LoginRequiredMixin, DetailView):
+    model = Post
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related("user")
+            .prefetch_related("comments")
+        )
+
+
+class CommentView(LoginRequiredMixin, CreateView):
+    model = Comment
 
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
