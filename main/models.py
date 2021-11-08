@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.templatetags.static import static
 
 
 class User(AbstractUser):
@@ -12,6 +13,12 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    @property
+    def icon_url(self):
+        if self.icon:
+            return self.icon.url
+        return static("main/img/default-icon.svg")
 
 
 class Post(models.Model):
