@@ -38,7 +38,4 @@
 </div>
 {% endblock %}
 
-{% block footer %}{% include "main/footer.html" with current="profile" %}{% endblock %}
-
-{% block extra_js %}
-{% endblock %}
+{% block footer %}{% include "main/footer.html" with current="profile" has_floating_button=True %}{% endblock %}

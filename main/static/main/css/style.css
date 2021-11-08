@@ -112,6 +112,21 @@ body {
     color: var(--darkgray);
 }
 
+.floating-button {
+    position: absolute;
+    display: block;
+    right: 16px;
+    bottom: 72px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    font-size: 24px;
+    line-height: 48px;
+    text-align: center;
+    color: var(--white);
+    background-color: var(--darkgray);
+}
+
 .tab__link {
     display: flex;
     flex-direction: column;

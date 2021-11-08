@@ -38,6 +38,8 @@
 </div>
 {% endblock %}
 
+{% block footer %}{% include "main/footer.html" with has_floating_button=True %}{% endblock %}
+
 {% block extra_js %}
 <script src="{% static 'main/js/action-menu.js' %}"></script>
 {% endblock %}
