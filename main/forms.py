@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import Post, User
+from .models import Comment, Post, User
 
 
 class SignUpForm(UserCreationForm):
@@ -27,6 +27,15 @@ class PostForm(forms.ModelForm):
         }
 
 
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ("text",)
+        widgets = {
+            "text": forms.Textarea(attrs={"placeholder": "コメント", "rows": 7})
+        }
+
+
 class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = User
@@ -34,3 +43,7 @@ class ProfileEditForm(forms.ModelForm):
         widgets = {
             "icon": forms.FileInput(attrs={"accept": "image/jpeg,image/png"}),
         }
+
+
+class ConfirmForm(forms.Form):
+    confirm = forms.BooleanField(required=True)

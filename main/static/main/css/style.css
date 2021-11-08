@@ -14,6 +14,7 @@
 body {
     font-family: sans-serif;
     margin: 0;
+    color: var(--black);
 }
 
 .header {
@@ -72,6 +73,10 @@ body {
     line-height: 4;
     color: var(--black);
     background-color: var(--white);
+}
+
+.round-button:hover {
+    cursor: pointer;
 }
 
 .tabs {
@@ -138,7 +143,7 @@ body {
     width: 100%;
 }
 
-.form-field :is(input, textarea) {
+.form-field :is(input, textarea):not([type="checkbox"]):not([type="radio"]) {
     width: 100%;
 }
 
@@ -150,21 +155,31 @@ body {
     width: 100%;
 }
 
+.form--confirm .form-field--submit {
+    display: flex;
+}
+
+.form--confirm .form-field--submit button {
+    flex-basis: 50%;
+    margin: 8px;
+    font-size: 0.8rem;
+}
+
 .post-list {
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
-.post-list__item {
+.post {
     padding: 8px;
 }
 
-.post-list__image {
+.post__image {
     position: relative;
 }
 
-.post-list__image a {
+.post__image .menu-button {
     position: absolute;
     display: block;
     top: 0;
@@ -173,9 +188,53 @@ body {
     color: var(--darkgray);
 }
 
-.post-list__image img {
+.post__image img {
     display: block;
     width: 100%;
+}
+
+.post__actions {
+    display: flex;
+    margin: 4px 0;
+}
+
+.post__like {
+    font-size: 32px;
+    margin: 0 16px;
+}
+
+.post__comment {
+    font-size: 32px;
+    margin: 0 16px;
+}
+
+.post__user {
+    margin: 0 16px 0 auto;
+}
+
+.post__user:not(.post__like ~ .post__comment ~ .post__user) {
+    margin: 0;
+}
+
+.post__user .user {
+    display: flex;
+}
+
+.post__user img {
+    width: 48px;
+    height: 48px;
+    margin-right: 8px;
+    border-radius: 50%;
+}
+
+.post__user span {
+    font-size: 20px;
+    line-height: 48px;
+}
+
+:is(.post__like, .post__comment, .post__user) a {
+    color: inherit;
+    text-decoration: none;
 }
 
 .action-menu {
@@ -208,4 +267,10 @@ body {
     width: max-content;
     list-style: none;
     padding: 0;
+    margin: 0;
+}
+
+.action-list a {
+    text-decoration: none;
+    color: var(--black);
 }

@@ -1,0 +1,30 @@
+{% extends "main/base.html" %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+<form method="post" class="form form--confirm">
+    <h2>確認</h2>
+    {% csrf_token %}
+    <div class="form-field">
+        {{ form.confirm }}
+        <label for="{{ form.confirm.id_for_label }}">投稿を削除します</label>
+    </div>
+    <div class="form-field form-field--submit">
+        <button type="button" id="cancel" class="round-button">キャンセル</button>
+        <button type="submit" class="round-button">削除</button>
+    </div>
+</form>
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block extra_js %}
+<script>
+    !function () {
+        document.getElementById("cancel").addEventListener("click", function () {
+            window.history.back();
+        });
+    }();
+</script>
+{% endblock %}

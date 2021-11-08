@@ -10,11 +10,17 @@ from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
-from .forms import PostForm, ProfileEditForm, SignUpForm
-from .models import Post
+from .forms import (
+    CommentForm,
+    ConfirmForm,
+    PostForm,
+    ProfileEditForm,
+    SignUpForm,
+)
+from .models import Comment, Post
 from .tokens import account_activation_token
 
 User = get_user_model()
@@ -87,6 +93,37 @@ class PostView(LoginRequiredMixin, CreateView):
         self.object.user = self.request.user
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
+
+
+class PostDeleteView(LoginRequiredMixin, DeleteView):
+    model = Post
+    form_class = ConfirmForm
+    success_url = reverse_lazy("home")
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+
+
+class PostDetailView(LoginRequiredMixin, DetailView):
+    model = Post
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related("user")
+            .prefetch_related("comments")
+        )
+
+
+class CommentView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+
+    def get_form_kwargs(self):
+        post = get_object_or_404(Post, pk=self.kwargs["post_pk"])
+        self.object = self.model(user=self.request.user, post=post)
+        return super().get_form_kwargs()
 
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):
