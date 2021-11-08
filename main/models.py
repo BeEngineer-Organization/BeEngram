@@ -3,7 +3,8 @@ from django.db import models
 
 
 class User(AbstractUser):
-    username = models.CharField(max_length=20, unique=True)
+    username = models.CharField("ユーザー名", max_length=20, unique=True)
+    email = models.EmailField("メールアドレス", unique=True)
     profile = models.CharField(max_length=150)
     follow = models.ManyToManyField("User", related_name="followed")
     icon = models.ImageField(upload_to="icons/", blank=True)
