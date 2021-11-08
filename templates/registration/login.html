@@ -1,9 +1,27 @@
 {% extends "main/base.html" %}
+
 {% block header %}{% endblock %}
+
 {% block content %}
-<form method="POST">
+<form method="post" class="form form--center">
     {% csrf_token %}
-    {{ form }}
-<button type="submit">ログイン</button>
+    {% for field in form %}
+    <div class="form-field">
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.errors %}
+        <ul class="form-field__errors">
+            {% for error in field.errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    {% endfor %}
+    <div class="form-field form-field--submit">
+        <button type="submit" class="round-button">ログイン</button>
+    </div>
+</form>
 {% endblock %}
+
 {% block footer %}{% endblock %}
