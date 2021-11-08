@@ -50,7 +50,11 @@
                 </div>
                 <div class="post__user">
                     <a href="{% url 'profile' post.user.pk %}" class="user">
+                        {% if post.user.icon %}
                         <img src="{{ post.user.icon.url }}">
+                        {% else %}
+                        <img src="/static/main/img/noimage.png">
+                        {% endif %}
                         <span>{{ post.user.username }}</span>
                     </a>
                 </div>

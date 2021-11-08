@@ -154,7 +154,6 @@ class FollowListView(LoginRequiredMixin, ListView):
     paginate_by = 20
     
     def get(self, request, *args, **kwargs):
-        self.user_id = kwargs["pk"]
         user = get_object_or_404(User, pk=kwargs["pk"])
         follow_list = user.follow.all()
         if "followed" in self.request.GET:
@@ -193,6 +192,6 @@ class FollowListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["user_id"] = self.user_id
+        context["user_id"] = self.kwargs["pk"]
         return context
 
