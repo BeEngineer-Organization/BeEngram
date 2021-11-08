@@ -47,3 +47,11 @@ class ProfileEditForm(forms.ModelForm):
 
 class ConfirmForm(forms.Form):
     confirm = forms.BooleanField(required=True)
+
+
+class SearchForm(forms.Form):
+    keyword = forms.CharField(
+        label="検索",
+        required=True,
+        widget=forms.TextInput(attrs={"placeholder": "検索"}),
+    )

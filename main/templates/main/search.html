@@ -21,6 +21,12 @@
 
 {% block content %}
 {% if 'post' in request.GET %}
+<div>
+    <form method="get">
+        <input type="hidden" name="post" value="">
+        {{form}}
+    </form>
+</div>
 <ul class="post-list">
     {% for post in object_list %}
     <li class="post-list__item">
@@ -68,6 +74,12 @@
     {% endfor %}
 </ul>
 {% else %}
+<div>
+    <form method="get">
+        <input type="hidden" name="user" value="">
+        {{form}}
+    </form>
+</div>
 <ul class="user-list">
     {% for user in object_list %}
     <li class="user-list__item">

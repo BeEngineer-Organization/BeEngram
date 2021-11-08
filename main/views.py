@@ -19,6 +19,7 @@ from .forms import (
     PostForm,
     ProfileEditForm,
     SignUpForm,
+    SearchForm,
 )
 from .models import Comment, Post
 from .tokens import account_activation_token
@@ -203,9 +204,30 @@ class SearchView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        if "post" in self.request.GET:
-            queryset = Post.objects.all().select_related("user")
+        form = SearchForm(self.request.GET)
+        if form.is_valid():
+            keyword = form.cleaned_data.get("keyword")
+            if "post" in self.request.GET:
+                queryset = Post.objects.all().select_related("user")
+                if keyword:
+                    queryset = queryset.filter(note__icontains=keyword)
+            else:
+                queryset = super().get_queryset()
+                if keyword:
+                    queryset = queryset.filter(username__icontains=keyword)
         else:
-            queryset = super().get_queryset()
+            if "post" in self.request.GET:
+                queryset = Post.objects.none()
+            else:
+                queryset = User.objects.none()
 
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if "keyword" in self.request.GET:
+            context["form"] = SearchForm(self.request.GET)
+        else:
+            context["form"] = SearchForm()
+        print(self.request.session)
+        return context
