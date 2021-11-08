@@ -212,6 +212,10 @@ body {
     margin: 0 16px 0 auto;
 }
 
+.post__user:not(.post__like ~ .post__comment ~ .post__user) {
+    margin: 0;
+}
+
 .post__user .user {
     display: flex;
 }

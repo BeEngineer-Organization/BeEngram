@@ -4,7 +4,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
 from django.db.models import Count, Q
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes, force_str
@@ -13,7 +13,13 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
-from .forms import ConfirmForm, PostForm, ProfileEditForm, SignUpForm
+from .forms import (
+    CommentForm,
+    ConfirmForm,
+    PostForm,
+    ProfileEditForm,
+    SignUpForm,
+)
 from .models import Comment, Post
 from .tokens import account_activation_token
 
@@ -112,6 +118,12 @@ class PostDetailView(LoginRequiredMixin, DetailView):
 
 class CommentView(LoginRequiredMixin, CreateView):
     model = Comment
+    form_class = CommentForm
+
+    def get_form_kwargs(self):
+        post = get_object_or_404(Post, pk=self.kwargs["post_pk"])
+        self.object = self.model(user=self.request.user, post=post)
+        return super().get_form_kwargs()
 
 
 class ProfileEditView(LoginRequiredMixin, UpdateView):

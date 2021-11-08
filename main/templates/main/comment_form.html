@@ -1,0 +1,28 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+<form action="" method="post" class="form">
+    {% with post=form.instance.post %}
+    <div class="post">
+        <div class="post__actions">
+            <div class="post__user">
+                <a href="{% url 'profile' post.user.pk %}" class="user">
+                    <img src="{{ post.user.icon.url }}">
+                    <span>{{ post.user.username }}</span>
+                </a>
+            </div>
+        </div>
+        <div class="post__body">
+            {{ post.note }}
+        </div>
+    </div>
+    {% endwith %}
+    {% csrf_token %}
+    <div class="form-field">
+        {{ form.text }}
+    </div>
+    <div class="form-field form-field--submit">
+        <button type="submit" class="round-button">コメント</button>
+    </div>
+</form>
+{% endblock %}
