@@ -119,6 +119,7 @@ class PostDetailView(LoginRequiredMixin, DetailView):
 class CommentView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
+    success_url = reverse_lazy("home")
 
     def get_form_kwargs(self):
         post = get_object_or_404(Post, pk=self.kwargs["post_pk"])
