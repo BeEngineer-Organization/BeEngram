@@ -141,13 +141,13 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
 class ProfileView(LoginRequiredMixin, DetailView):
     model = User
 
-    def get(self, request, *args, **kwargs):
-        self.queryset = User.objects.filter(pk=kwargs["pk"]).prefetch_related("posts", "like").annotate(
+    def get_queryset(self):
+        queryset = User.objects.filter(pk=self.kwargs["pk"]).prefetch_related("posts", "like").annotate(
             Count("posts", distinct=True),
             Count("follow", distinct=True),
             Count("followed", distinct=True),
         )
-        return super().get(self, request, *args, **kwargs)
+        return queryset
 
 
 class FollowListView(LoginRequiredMixin, ListView):
