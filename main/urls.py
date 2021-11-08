@@ -38,4 +38,5 @@ urlpatterns = [
         views.ProfileEditView.as_view(),
         name="edit_profile",
     ),
+    path("search/", views.SearchView.as_view(), name="search"),
 ]

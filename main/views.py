@@ -196,3 +196,16 @@ class FollowListView(LoginRequiredMixin, ListView):
         context["user_id"] = self.kwargs["pk"]
         return context
 
+
+class SearchView(LoginRequiredMixin, ListView):
+    model = User
+    template_name = "main/search.html"
+    paginate_by = 20
+
+    def get_queryset(self):
+        if "post" in self.request.GET:
+            queryset = Post.objects.all().select_related("user")
+        else:
+            queryset = super().get_queryset()
+
+        return queryset

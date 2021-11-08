@@ -34,7 +34,7 @@
             <a href="{% url 'profile' user.pk %}">{{user.username}}</a>
         </div>
         {% if user.pk is not request.user.pk  %}
-        <div class="follow-list__is-follow">
+        <div class="follow-list__is-followed">
             <form method="post">
             {% csrf_token %}
             <input type="hidden" name="target" value="{{ user.pk }}">
