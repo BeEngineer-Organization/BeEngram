@@ -26,6 +26,9 @@ urlpatterns = [
     ),
     path("activate/<uidb64>/<token>/", views.activate, name="activate"),
     path("post/", views.PostView.as_view(), name="new_post"),
+    path(
+        "delete_post/<pk>", views.PostDeleteView.as_view(), name="delete_post"
+    ),
     path("profile/<int:pk>", views.ProfileView.as_view(), name="profile"),
     path(
         "edit_profile/<int:pk>",

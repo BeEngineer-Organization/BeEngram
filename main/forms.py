@@ -34,3 +34,7 @@ class ProfileEditForm(forms.ModelForm):
         widgets = {
             "icon": forms.FileInput(attrs={"accept": "image/jpeg,image/png"}),
         }
+
+
+class ConfirmForm(forms.Form):
+    confirm = forms.BooleanField(required=True)

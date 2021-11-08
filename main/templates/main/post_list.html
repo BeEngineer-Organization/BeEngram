@@ -25,18 +25,18 @@
     <li class="post-list__item">
         <div class="post-list__image">
             <img src="{{ post.img.url }}">
-            <a role="button">
+            <div class="menu-button" role="button">
                 <i class="fas fa-ellipsis-h"></i>
                 <div class="action-menu">
                     <ul class="action-list">
                         <li class="action-list__item">
                             {% if post.user == user %}
-                            <span role="button" data-action="">削除</span>
+                            <a href="{% url 'delete_post' post.pk %}">削除</a>
                             {% endif %}
                         </li>
                     </ul>
                 </div>
-            </a>
+            </div>
         </div>
         <div class="post-list__actions">
             <div class="post-list__like"></div>

@@ -74,6 +74,10 @@ body {
     background-color: var(--white);
 }
 
+.round-button:hover {
+    cursor: pointer;
+}
+
 .tabs {
     display: flex;
     height: 100%;
@@ -138,7 +142,7 @@ body {
     width: 100%;
 }
 
-.form-field :is(input, textarea) {
+.form-field :is(input, textarea):not([type="checkbox"]):not([type="radio"]) {
     width: 100%;
 }
 
@@ -148,6 +152,16 @@ body {
 
 .form-field--submit [type="submit"] {
     width: 100%;
+}
+
+.form--confirm .form-field--submit {
+    display: flex;
+}
+
+.form--confirm .form-field--submit button {
+    flex-basis: 50%;
+    margin: 8px;
+    font-size: 0.8rem;
 }
 
 .post-list {
@@ -164,7 +178,7 @@ body {
     position: relative;
 }
 
-.post-list__image a {
+.post-list__image .menu-button {
     position: absolute;
     display: block;
     top: 0;
@@ -208,4 +222,9 @@ body {
     width: max-content;
     list-style: none;
     padding: 0;
+}
+
+.action-list a {
+    text-decoration: none;
+    color: var(--black);
 }
