@@ -32,9 +32,11 @@ urlpatterns = [
     ),
     path("comment/<post_pk>/", views.CommentView.as_view(), name="comment"),
     path("profile/<int:pk>", views.ProfileView.as_view(), name="profile"),
+    path("profile/follow-list/<int:pk>/", views.FollowListView.as_view(), name="follow_list"),
     path(
         "edit_profile/<int:pk>",
         views.ProfileEditView.as_view(),
         name="edit_profile",
     ),
+    path("search/", views.SearchView.as_view(), name="search"),
 ]

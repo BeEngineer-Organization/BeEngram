@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import EmailMessage
-from django.db.models import Count, Q
+from django.db.models import Case, Count, Q, When
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
@@ -19,6 +19,7 @@ from .forms import (
     PostForm,
     ProfileEditForm,
     SignUpForm,
+    SearchForm,
 )
 from .models import Comment, Post
 from .tokens import account_activation_token
@@ -119,6 +120,7 @@ class PostDetailView(LoginRequiredMixin, DetailView):
 class CommentView(LoginRequiredMixin, CreateView):
     model = Comment
     form_class = CommentForm
+    success_url = reverse_lazy("home")
 
     def get_form_kwargs(self):
         post = get_object_or_404(Post, pk=self.kwargs["post_pk"])
@@ -139,9 +141,93 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
 class ProfileView(LoginRequiredMixin, DetailView):
     model = User
 
-    def get_queryset(self):
-        return User.objects.prefetch_related("posts", "like").annotate(
-            Count("posts"),
-            Count("follow"),
-            Count("followed"),
+    def get(self, request, *args, **kwargs):
+        self.queryset = User.objects.filter(pk=kwargs["pk"]).prefetch_related("posts", "like").annotate(
+            Count("posts", distinct=True),
+            Count("follow", distinct=True),
+            Count("followed", distinct=True),
         )
+        return super().get(self, request, *args, **kwargs)
+
+
+class FollowListView(LoginRequiredMixin, ListView):
+    model = User
+    template_name = "main/follow_list.html"
+    paginate_by = 20
+    
+    def get(self, request, *args, **kwargs):
+        user = get_object_or_404(User, pk=kwargs["pk"])
+        follow_list = user.follow.all()
+        if "followed" in self.request.GET:
+            self.queryset = (
+                user.followed
+                .annotate(
+                    is_follow=Case(
+                        When(followed__id__contains=request.user.pk, then=True),
+                        default=False
+                    )
+                )
+            )
+        else:
+            self.queryset = (
+                follow_list
+                .annotate(
+                    is_follow=Case(
+                        When(followed__id__contains=request.user.pk, then=True),
+                        default=False
+                    )
+                )
+            )
+
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        target = get_object_or_404(User, pk=request.POST["target"])
+        if "follow" in request.POST:
+            user.follow.add(target)
+            user.save()
+        elif "unfollow" in request.POST:
+            user.follow.remove(target)
+            user.save()
+        return self.get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_id"] = self.kwargs["pk"]
+        return context
+
+
+class SearchView(LoginRequiredMixin, ListView):
+    model = User
+    template_name = "main/search.html"
+    paginate_by = 20
+
+    def get_queryset(self):
+        form = SearchForm(self.request.GET)
+        if form.is_valid():
+            keyword = form.cleaned_data.get("keyword")
+            if "post" in self.request.GET:
+                queryset = Post.objects.all().select_related("user")
+                if keyword:
+                    queryset = queryset.filter(note__icontains=keyword)
+            else:
+                queryset = super().get_queryset()
+                if keyword:
+                    queryset = queryset.filter(username__icontains=keyword)
+        else:
+            if "post" in self.request.GET:
+                queryset = Post.objects.none()
+            else:
+                queryset = User.objects.none()
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if "keyword" in self.request.GET:
+            context["form"] = SearchForm(self.request.GET)
+        else:
+            context["form"] = SearchForm()
+        print(self.request.session)
+        return context
