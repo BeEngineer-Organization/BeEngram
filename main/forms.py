@@ -21,7 +21,9 @@ class PostForm(forms.ModelForm):
                     "data-form-image": True,
                 }
             ),
-            "note": forms.Textarea(attrs={"placeholder": "説明文", "rows": 7}),
+            "note": forms.Textarea(
+                attrs={"placeholder": "説明文（300字以内）", "rows": 7}
+            ),
         }
 
 
@@ -30,7 +32,9 @@ class CommentForm(forms.ModelForm):
         model = Comment
         fields = ("text",)
         widgets = {
-            "text": forms.Textarea(attrs={"placeholder": "コメント", "rows": 7})
+            "text": forms.Textarea(
+                attrs={"placeholder": "コメント（150字以内）", "rows": 7}
+            )
         }
 
 
