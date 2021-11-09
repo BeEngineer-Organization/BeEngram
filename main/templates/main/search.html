@@ -83,28 +83,16 @@
 <ul class="user-list">
     {% for user in object_list %}
     <li class="user-list__item">
-        <div class="user-list__image">
-            {% if user.icon %}
-            <img src="{{user.icon.url}}" alt="ユーザーアイコン">
-            {% else %}
-            <img src="/static/main/img/noimage.png" alt="ユーザーアイコン">
-            {% endif %}
-        </div>
-        <div class="user-list__username">
-            <a href="{% url 'profile' user.pk %}">{{user.username}}</a>
-        </div>
+        <a href="{% url 'profile' user.pk %}" class="user">
+            <img src="{{ user.icon_url }}" alt="ユーザーアイコン">
+            <span>{{ user.username }}</span>
+        </a>
         {% if user.pk is not request.user.pk  %}
-        <div class="user-list__is-followed">
-            <form method="post">
+        <form method="post">
             {% csrf_token %}
             <input type="hidden" name="target" value="{{ user.pk }}">
-            {% if user.is_follow %}
-            <button type="submit" name="unfollow">フォロー中</button>
-            {% else %}
-            <button type="submit" name="follow">フォロー</button>
-            {% endif %}
-            </form>
-        </div>
+            <button type="submit" name="{% if user.is_follow %}un{% endif %}follow" class="round-button round-button--narrow">フォロー{% if user.is_follow %}中{% endif %}</button>
+        </form>
         {% endif %}
     </li>
     {% endfor %}
