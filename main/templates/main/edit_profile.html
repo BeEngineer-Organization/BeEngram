@@ -1,13 +1,14 @@
 {% extends "main/base.html" %}
+{% load static %}
 
 {% block header %}{% include "main/header.html" with title="プロフィール編集" %}{% endblock %}
 
 {% block content %}
-<form method="post" enctype="multipart/form-data">
+<form method="post" enctype="multipart/form-data" class="form">
     {% csrf_token %}
     {% for field in form %}
     {% if field.name == "icon" %}
-    <div class="form-field form-field--image">
+    <div class="form-field form-field--image form-field--icon">
         {{ field }}
         <label for="{{ field.id_for_label }}">
             <img src="{{ field.value.url }}" alt="{{ field.value.url }}">
@@ -24,12 +25,24 @@
     <div class="form-field">
         {{ field.label_tag }}
         {{ field }}
+        {% if field.errors %}
+        <ul class="form-field__errors">
+            {% for err in field.errors %}
+            <li>{{ err }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
     </div>
     {% endif %}
     {% endfor %}
     <div class="form-field form-field--submit">
-        <button type="submit">保存</button>
+        <button type="submit" class="round-button">保存</button>
     </div>
+</form>
 {% endblock %}
 
 {% block footer %}{% include "main/footer.html" with current="profile" %}{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'main/js/form-image.js' %}"></script>
+{% endblock %}

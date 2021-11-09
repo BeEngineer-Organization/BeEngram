@@ -170,6 +170,13 @@ body {
     position: relative;
 }
 
+.form-field--icon {
+    width: 64px;
+    height: 64px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
 .form-field--image input {
     position: absolute;
     opacity: 0;
@@ -178,6 +185,10 @@ body {
 .form-field--image label img {
     display: block;
     width: 100%;
+}
+
+.form-field--icon img {
+    border-radius: 50%;
 }
 
 .form-field :is(input, textarea):not([type="checkbox"]):not([type="radio"]) {
@@ -349,4 +360,13 @@ body {
     justify-content: space-between;
     height: 48px;
     margin: 8px;
+}
+
+.settings {
+    margin: 32px;
+}
+
+.settings a {
+    display: block;
+    margin: 32px 0;
 }
