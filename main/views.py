@@ -117,7 +117,7 @@ class PostDetailView(LoginRequiredMixin, DetailView):
             .select_related("user")
             .prefetch_related("comments")
         )
-
+    
 
 class CommentView(LoginRequiredMixin, CreateView):
     model = Comment
@@ -183,6 +183,11 @@ class FollowListView(LoginRequiredMixin, ListView):
 
         return super().get_queryset()
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["user_id"] = self.kwargs["pk"]
+        return context
+
     def post(self, request, *args, **kwargs):
         user = request.user
         target = get_object_or_404(User, pk=request.POST["target"])
@@ -193,11 +198,6 @@ class FollowListView(LoginRequiredMixin, ListView):
             user.follow.remove(target)
             user.save()
         return self.get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["user_id"] = self.kwargs["pk"]
-        return context
 
 
 class SearchView(LoginRequiredMixin, ListView):

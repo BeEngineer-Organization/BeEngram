@@ -35,6 +35,20 @@
     <div class="post__body">
         {{ post.note }}
     </div>
+    <div class="post__comments">
+        <h3>コメント</h3>
+        {% for comment in post.comments.all %}
+        <div class="post__response">
+            <div>
+                <img src="{{ comment.user.icon_url }}" alt="ユーザーアイコン">
+                <span>{{ comment.user.username }}</span>
+            </div>
+            <div>{{ comment.text }}</div>
+            <div>{{ comment.post_date }}</div>
+            <hr>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
 
