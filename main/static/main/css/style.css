@@ -362,6 +362,10 @@ body {
     margin: 8px;
 }
 
+.user-list__item .round-button {
+    width: 8em;
+}
+
 .settings {
     margin: 32px;
 }
@@ -372,7 +376,6 @@ body {
 }
 
 .profile {
-    /* width: 100%; */
     margin: 32px;
 }
 
@@ -445,7 +448,6 @@ a.profile-counter {
 }
 
 .post-grid__item {
-    /* display: flex; */
     padding: 4px;
     flex: 0 0 calc(100% / 3);
 }

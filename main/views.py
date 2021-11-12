@@ -1,9 +1,6 @@
 from django.contrib.auth import get_user_model, login
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.mail import EmailMessage
 from django.db.models import Case, Count, Q, When
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -11,6 +8,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse_lazy
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from django.views.generic.base import View
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
@@ -20,8 +18,8 @@ from .forms import (
     ConfirmForm,
     PostForm,
     ProfileEditForm,
-    SignUpForm,
     SearchForm,
+    SignUpForm,
 )
 from .models import Comment, Post
 from .tokens import account_activation_token
@@ -51,9 +49,10 @@ class SignUpView(CreateView):
 
     def form_valid(self, form):
         user = form.save(commit=False)
-        self.object = user
         user.is_active = False
         user.save()
+        self.object = user
+
         current_site = get_current_site(self.request)
         mail_subject = "[BeEngram] アカウントを有効化してください"
         message = render_to_string(
@@ -65,9 +64,7 @@ class SignUpView(CreateView):
                 "token": account_activation_token.make_token(user),
             },
         )
-        to_email = form.cleaned_data.get("email")
-        email = EmailMessage(mail_subject, message, to=[to_email])
-        email.send()
+        user.email_user(mail_subject, message)
         return HttpResponseRedirect(self.get_success_url())
 
 
@@ -117,7 +114,7 @@ class PostDetailView(LoginRequiredMixin, DetailView):
             .select_related("user")
             .prefetch_related("comments")
         )
-    
+
 
 class CommentView(LoginRequiredMixin, CreateView):
     model = Comment
@@ -144,42 +141,44 @@ class ProfileView(LoginRequiredMixin, DetailView):
     model = User
 
     def get_queryset(self):
-        queryset = User.objects.filter(pk=self.kwargs["pk"]).prefetch_related("posts", "like").annotate(
-            Count("posts", distinct=True),
-            Count("follow", distinct=True),
-            Count("followed", distinct=True),
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related("posts", "like")
+            .annotate(
+                Count("posts", distinct=True),
+                Count("follow", distinct=True),
+                Count("followed", distinct=True),
+            )
         )
-        return queryset
 
 
-class FollowListView(LoginRequiredMixin, ListView):
-    model = User
+class FollowMixin:
+    def post(self, request, *args, **kwargs):
+        target = get_object_or_404(User, pk=self.request.POST.get("target", 0))
+        if "follow" in self.request.POST:
+            self.request.user.follow.add(target)
+        elif "unfollow" in self.request.POST:
+            self.request.user.follow.remove(target)
+        return HttpResponseRedirect(self.request.META.get("HTTP_REFERER"))
+
+
+class FollowListView(LoginRequiredMixin, FollowMixin, ListView):
     template_name = "main/follow_list.html"
-    paginate_by = 20
-    
+    ordering = ("username",)
+
     def get_queryset(self):
         user = get_object_or_404(User, pk=self.kwargs["pk"])
-        follow_list = user.follow.all()
         if "followed" in self.request.GET:
-            self.queryset = (
-                user.followed
-                .annotate(
-                    is_follow=Case(
-                        When(followed__id__contains=self.request.user.pk, then=True),
-                        default=False
-                    )
-                )
-            )
+            queryset = user.followed
         else:
-            self.queryset = (
-                follow_list
-                .annotate(
-                    is_follow=Case(
-                        When(followed__id__contains=self.request.user.pk, then=True),
-                        default=False
-                    )
-                )
+            queryset = user.follow
+        self.queryset = queryset.annotate(
+            is_follow=Case(
+                When(followed__id__contains=self.request.user.pk, then=True),
+                default=False,
             )
+        )
 
         return super().get_queryset()
 
@@ -188,41 +187,41 @@ class FollowListView(LoginRequiredMixin, ListView):
         context["user_id"] = self.kwargs["pk"]
         return context
 
-    def post(self, request, *args, **kwargs):
-        user = request.user
-        target = get_object_or_404(User, pk=request.POST["target"])
-        if "follow" in request.POST:
-            user.follow.add(target)
-            user.save()
-        elif "unfollow" in request.POST:
-            user.follow.remove(target)
-            user.save()
-        return self.get(request, *args, **kwargs)
 
-
-class SearchView(LoginRequiredMixin, ListView):
-    model = User
+class SearchView(LoginRequiredMixin, FollowMixin, ListView):
     template_name = "main/search.html"
-    paginate_by = 20
 
     def get_queryset(self):
         form = SearchForm(self.request.GET)
         if form.is_valid():
-            keyword = form.cleaned_data.get("keyword")
+            keyword = form.cleaned_data["keyword"]
             if "post" in self.request.GET:
-                queryset = Post.objects.all().select_related("user")
-                if keyword:
-                    queryset = queryset.filter(note__icontains=keyword)
+                self.queryset = self._search_posts(keyword)
             else:
-                queryset = super().get_queryset()
-                if keyword:
-                    queryset = queryset.filter(username__icontains=keyword)
+                self.queryset = self._search_users(keyword)
         else:
             if "post" in self.request.GET:
-                queryset = Post.objects.none()
+                self.queryset = Post.objects.none()
             else:
-                queryset = User.objects.none()
+                self.queryset = User.objects.none()
 
+        return super().get_queryset()
+
+    def _search_posts(self, keyword):
+        queryset = Post.objects.all().select_related("user")
+        for word in keyword.split():
+            queryset = queryset.filter(note__icontains=word)
+        return queryset
+
+    def _search_users(self, keyword):
+        queryset = User.objects.all().annotate(
+            is_follow=Case(
+                When(followed__id__contains=self.request.user.pk, then=True),
+                default=False,
+            )
+        )
+        for word in keyword.split():
+            queryset = queryset.filter(username__icontains=word)
         return queryset
 
     def get_context_data(self, **kwargs):
@@ -233,18 +232,16 @@ class SearchView(LoginRequiredMixin, ListView):
             context["form"] = SearchForm()
         return context
 
-@login_required
-def like(request, pk):
-    try:
-        post = Post.objects.get(pk=pk)
-        user = request.user
-        if post in user.like.all():
-            user.like.remove(post)
-            user.save()
-        else:
-            user.like.add(post)
-            user.save()
-        result = "success"
-    except ObjectDoesNotExist:
-        result = "ObjectDoesNotExist"
-    return JsonResponse({"result": result})
+
+class PostLikeAPIView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        try:
+            post = Post.objects.get(pk=self.kwargs["pk"])
+            if post in self.request.user.like.all():
+                self.request.user.like.remove(post)
+            else:
+                self.request.user.like.add(post)
+            result = "success"
+        except Post.DoesNotExist:
+            result = "DoesNotExist"
+        return JsonResponse({"result": result})

@@ -25,19 +25,25 @@ urlpatterns = [
         name="signup_email_send",
     ),
     path("activate/<uidb64>/<token>/", views.activate, name="activate"),
-    path("post/<pk>", views.PostDetailView.as_view(), name="post_detail"),
+    path("post/<int:pk>", views.PostDetailView.as_view(), name="post_detail"),
     path("post/", views.PostView.as_view(), name="new_post"),
     path(
-        "delete_post/<pk>", views.PostDeleteView.as_view(), name="delete_post"
+        "delete_post/<int:pk>",
+        views.PostDeleteView.as_view(),
+        name="delete_post",
     ),
-    path("comment/<post_pk>/", views.CommentView.as_view(), name="comment"),
+    path("comment/<int:post_pk>", views.CommentView.as_view(), name="comment"),
     path("profile/<int:pk>", views.ProfileView.as_view(), name="profile"),
-    path("profile/follow-list/<int:pk>/", views.FollowListView.as_view(), name="follow_list"),
+    path(
+        "profile/follow-list/<int:pk>",
+        views.FollowListView.as_view(),
+        name="follow_list",
+    ),
     path(
         "edit_profile/<int:pk>",
         views.ProfileEditView.as_view(),
         name="edit_profile",
     ),
     path("search/", views.SearchView.as_view(), name="search"),
-    path("like/<int:pk>", views.like, name="like"),
+    path("like/<int:pk>", views.PostLikeAPIView.as_view(), name="like"),
 ]
