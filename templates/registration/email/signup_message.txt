@@ -1,0 +1,6 @@
+{% autoescape off %}
+{{ user.username }} さん、BeEngram にご登録いただきありがとうございます！
+
+以下のリンクより、アカウントを有効化してください。リンクの有効期限は 1 日です。
+{{ protocol }}://{{ domain }}{% url 'activate' token %}
+{% endautoescape %}

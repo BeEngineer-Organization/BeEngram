@@ -1,14 +1,17 @@
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
+from django.core import signing
 from django.db.models import Case, Count, Q, When
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.http import (
+    HttpResponseBadRequest,
+    HttpResponseRedirect,
+    JsonResponse,
+)
+from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
-from django.utils.encoding import force_bytes, force_str
-from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from django.views.generic.base import View
+from django.views.generic.base import RedirectView, View
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
@@ -22,7 +25,6 @@ from .forms import (
     SignUpForm,
 )
 from .models import Comment, Post
-from .tokens import account_activation_token
 
 User = get_user_model()
 
@@ -54,33 +56,58 @@ class SignUpView(CreateView):
         self.object = user
 
         current_site = get_current_site(self.request)
-        mail_subject = "[BeEngram] アカウントを有効化してください"
+        context = {
+            "protocol": self.request.scheme,
+            "domain": current_site.domain,
+            "token": signing.dumps(user.pk),
+            "user": user,
+        }
+        subject = "[BeEngram] アカウントを有効化してください"
         message = render_to_string(
-            "registration/signup_email.html",
-            {
-                "user": user,
-                "domain": current_site.domain,
-                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-                "token": account_activation_token.make_token(user),
-            },
+            "registration/email/signup_message.txt", context
         )
-        user.email_user(mail_subject, message)
+        user.email_user(subject, message)
         return HttpResponseRedirect(self.get_success_url())
 
 
-def activate(request, uidb64, token):
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
-    if user is not None and account_activation_token.check_token(user, token):
+class ActivateView(RedirectView):
+    url = reverse_lazy("home")
+    max_age = 60 * 60 * 24
+
+    def get(self, request, *args, **kwargs):
+        response400 = HttpResponseBadRequest(
+            "このリンクは無効です。申し訳ありませんが、もう一度登録の処理をやり直してください。"
+        )
+
+        token = self.kwargs["token"]
+        try:
+            user_pk = signing.loads(token, max_age=self.max_age)
+        except signing.BadSignature:
+            return HttpResponseBadRequest(
+                "このリンクは無効です。申し訳ありませんが、もう一度登録の処理をやり直してください。"
+            )
+        except signing.SignatureExpired:
+            return HttpResponseBadRequest(
+                "このリンクは無効です。申し訳ありませんが、もう一度登録の処理をやり直してください。"
+            )
+
+        try:
+            user = User.objects.get(pk=user_pk)
+        except User.DoesNotExist:
+            return HttpResponseBadRequest(
+                "このリンクは無効です。申し訳ありませんが、もう一度登録の処理をやり直してください。"
+            )
+
+        if user.is_active:
+            return HttpResponseBadRequest(
+                "このリンクは無効です。申し訳ありませんが、もう一度登録の処理をやり直してください。"
+            )
+
         user.is_active = True
         user.save()
-        login(request, user)
-        return redirect("home")
-    else:
-        return HttpResponse("このリンクは無効です。申し訳ありませんが、もう一度登録の処理をやり直してください。")
+        login(self.request, user)
+
+        return super().get(request, *args, **kwargs)
 
 
 class PostView(LoginRequiredMixin, CreateView):
