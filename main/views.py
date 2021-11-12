@@ -1,9 +1,11 @@
 from django.contrib.auth import get_user_model, login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import EmailMessage
 from django.db.models import Case, Count, Q, When
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse_lazy
@@ -155,15 +157,15 @@ class FollowListView(LoginRequiredMixin, ListView):
     template_name = "main/follow_list.html"
     paginate_by = 20
     
-    def get(self, request, *args, **kwargs):
-        user = get_object_or_404(User, pk=kwargs["pk"])
+    def get_queryset(self):
+        user = get_object_or_404(User, pk=self.kwargs["pk"])
         follow_list = user.follow.all()
         if "followed" in self.request.GET:
             self.queryset = (
                 user.followed
                 .annotate(
                     is_follow=Case(
-                        When(followed__id__contains=request.user.pk, then=True),
+                        When(followed__id__contains=self.request.user.pk, then=True),
                         default=False
                     )
                 )
@@ -173,13 +175,13 @@ class FollowListView(LoginRequiredMixin, ListView):
                 follow_list
                 .annotate(
                     is_follow=Case(
-                        When(followed__id__contains=request.user.pk, then=True),
+                        When(followed__id__contains=self.request.user.pk, then=True),
                         default=False
                     )
                 )
             )
 
-        return super().get(request, *args, **kwargs)
+        return super().get_queryset()
 
     def post(self, request, *args, **kwargs):
         user = request.user
@@ -230,3 +232,19 @@ class SearchView(LoginRequiredMixin, ListView):
         else:
             context["form"] = SearchForm()
         return context
+
+@login_required
+def like(request, pk):
+    try:
+        post = Post.objects.get(pk=pk)
+        user = request.user
+        if post in user.like.all():
+            user.like.remove(post)
+            user.save()
+        else:
+            user.like.add(post)
+            user.save()
+        result = "success"
+    except ObjectDoesNotExist:
+        result = "ObjectDoesNotExist"
+    return JsonResponse({"result": result})
