@@ -370,3 +370,87 @@ body {
     display: block;
     margin: 32px 0;
 }
+
+.profile {
+    /* width: 100%; */
+    margin: 32px;
+}
+
+.profile__row {
+    display: flex;
+    justify-content: center;
+}
+
+.profile__row > * {
+    flex: 1;
+}
+
+.profile__icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.profile__icon img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+}
+
+.profile-counter {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+a.profile-counter {
+    color: inherit;
+    text-decoration: none;
+}
+
+.profile-counter__label {
+    font-size: 0.8em;
+}
+
+.profile__username {
+    font-size: 32px;
+}
+
+.profile__setting {
+    display: flex;
+    align-items: center;
+    flex: 0;
+    font-size: 24px;
+}
+
+.profile__setting a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.post-tabs {
+    position: sticky;
+    top: 64px;
+    background-color: var(--white);
+    z-index: 1;
+}
+
+.post-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.post-grid__item {
+    /* display: flex; */
+    padding: 4px;
+    flex: 0 0 calc(100% / 3);
+}
+
+.post-grid__item img {
+    display: block;
+    width: 100%;
+}

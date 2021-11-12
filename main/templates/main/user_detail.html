@@ -4,22 +4,34 @@
 {% block header %}{% include "main/header.html" with title="profile" %}{% endblock %}
 
 {% block content %}
-<div>
-    <div>
-        {% if user.icon %}
-        <img src="{{ user.icon.url }}" alt="ユーザーアイコン">
-        {% else %}
-        <img src="/static/main/img/noimage.png" alt="ユーザーアイコン">
+<div class="profile">
+    <div class="profile__row">
+        <div class="profile__icon">
+            <img src="{{ user.icon_url }}" alt="ユーザーアイコン">
+        </div>
+        <div class="profile-counter">
+            <span class="profile-counter__count">{{ user.posts__count }}</span>
+            <span class="profile-counter__label">投稿</span>
+        </div>
+        <a href="{% url 'follow_list' user.pk %}" class="profile-counter">
+            <span class="profile-counter__count">{{ user.follow__count }}</span>
+            <span class="profile-counter__label">フォロー</span>
+        </a>
+        <a href="{% url 'follow_list' user.pk %}?followed" class="profile-counter">
+            <span class="profile-counter__count">{{ user.followed__count }}</span>
+            <span class="profile-counter__label">フォロワー</span>
+        </a>
+    </div>
+    <div class="profile__row">
+        <div class="profile__username">{{ user.username }}</div>
+        {% if user == request.user %}
+        <div class="profile__setting">
+            <a href="{% url 'settings' %}"><i class="fas fa-cog"></i></a>
+        </div>
         {% endif %}
     </div>
-    <div>{{ user.posts__count }}</div>
-    <div><a href="{% url 'follow_list' user.pk %}">{{ user.follow__count }}</a></div>
-    <div><a href="{% url 'follow_list' user.pk %}?followed">{{ user.followed__count }}</a></div>
+    <div>{{ user.profile|linebreaks }}</div>
 </div>
-<div>{{ user.username }}</div>
-<div><a href="{% url 'settings' %}"><i class="fas fa-cog"></i></a></div>
-<div>{{ user.profile }}</div>
-
 
 <div class="post-tabs">
     <div class="tabs tabs--2">
@@ -37,16 +49,16 @@
 </div>
 
 {% if 'likes' not in request.GET %}
-<div>
-{% for my_post in user.posts.all %}
-<a href="{% url 'post_detail' my_post.pk %}"><img src="{{ my_post.img.url }}"></a>
-{% endfor %}
+<div class="post-grid">
+    {% for post in user.posts.all %}
+    <a href="{% url 'post_detail' post.pk %}" class="post-grid__item"><img src="{{ post.img.url }}"></a>
+    {% endfor %}
 </div>
 {% else %}
-<div>
-{% for liked_post in user.like.all %}
-<a href="{% url 'post_detail' liked_post.pk %}"><img src="{{ liked_post.img.url }}"></a>
-{% endfor %}
+<div class="post-grid">
+    {% for post in user.like.all %}
+    <a href="{% url 'post_detail' post.pk %}" class="post-grid__item"><img src="{{ post.img.url }}"></a>
+    {% endfor %}
 </div>
 {% endif %}
 {% endblock %}
