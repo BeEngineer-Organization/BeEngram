@@ -39,4 +39,5 @@ urlpatterns = [
         name="edit_profile",
     ),
     path("search/", views.SearchView.as_view(), name="search"),
+    path("like/<int:pk>", views.like, name="like"),
 ]

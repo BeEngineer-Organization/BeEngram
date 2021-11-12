@@ -20,7 +20,7 @@
     </div>
     <div class="post__actions">
         <div class="post__like">
-            <a class="like{% if post in user.like.all %} like--active{% endif %}"><i class="fas fa-heart"></i></a>
+            <a class="like{% if post in user.like.all %} like--active{% endif %}" data-pk="{{post.pk}}"><i class="fas fa-heart"></i></a>
         </div>
         <div class="post__comment">
             <a href="{% url 'comment' post.pk %}" class="comment"><i class="fas fa-comment"></i></a>
@@ -35,6 +35,20 @@
     <div class="post__body">
         {{ post.note }}
     </div>
+    <div class="post__comments">
+        <h3>コメント</h3>
+        {% for comment in post.comments.all %}
+        <div class="post__response">
+            <div>
+                <img src="{{ comment.user.icon_url }}" alt="ユーザーアイコン">
+                <span>{{ comment.user.username }}</span>
+            </div>
+            <div>{{ comment.text }}</div>
+            <div>{{ comment.post_date }}</div>
+            <hr>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
 
@@ -42,4 +56,5 @@
 
 {% block extra_js %}
 <script src="{% static 'main/js/action-menu.js' %}"></script>
+<script src="{% static 'main/js/like-post.js' %}"></script>
 {% endblock %}

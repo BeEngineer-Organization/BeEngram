@@ -50,7 +50,7 @@
             </div>
             <div class="post__actions">
                 <div class="post__like">
-                    <a class="like{% if post in user.like.all %} like--active{% endif %}"><i class="fas fa-heart"></i></a>
+                    <a class="like{% if post in user.like.all %} like--active{% endif %}" data-pk="{{post.pk}}"><i class="fas fa-heart"></i></a>
                 </div>
                 <div class="post__comment">
                     <a href="{% url 'comment' post.pk %}" class="comment"><i class="fas fa-comment"></i></a>
@@ -115,4 +115,5 @@
 {% block footer %}{% include "main/footer.html" with current="search" has_floating_button=True %}{% endblock %}
 
 {% block extra_js %}
+<script src="{% static 'main/js/like-post.js' %}"></script>
 {% endblock %}
