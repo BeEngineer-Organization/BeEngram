@@ -121,7 +121,7 @@ body {
 }
 
 .floating-button {
-    position: absolute;
+    position: fixed;
     display: block;
     right: 16px;
     bottom: 72px;
@@ -219,8 +219,13 @@ body {
 
 .post-list {
     list-style: none;
+    width: 100%;
     margin: 0;
     padding: 0;
+}
+
+.post-list__item {
+    width: 100%;
 }
 
 .post {
