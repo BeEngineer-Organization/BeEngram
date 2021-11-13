@@ -11,7 +11,7 @@
     <div class="form-field form-field--image form-field--icon">
         {{ field }}
         <label for="{{ field.id_for_label }}">
-            <img src="{{ field.value.url }}" alt="{{ field.value.url }}">
+            <img src="{% if field.value %}{{ field.value.url }}{% else %}{% static 'main/img/default-icon.svg' %}{% endif %}" alt="ユーザーアイコン">
         </label>
         {% if field.errors %}
         <ul class="form-field__errors">

@@ -7,11 +7,7 @@
         <div class="post__actions">
             <div class="post__user">
                 <a href="{% url 'profile' post.user.pk %}" class="user">
-                    {% if post.user.icon %}
-                    <img src="{{ post.user.icon.url }}">
-                    {% else %}
-                    <img src="/static/main/img/noimage.png">
-                    {% endif %}
+                    <img src="{{ post.user.icon_url }}">
                     <span>{{ post.user.username }}</span>
                 </a>
             </div>
