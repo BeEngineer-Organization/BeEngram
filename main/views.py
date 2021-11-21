@@ -160,11 +160,21 @@ class ProfileEditView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
 
-class ProfileView(LoginRequiredMixin, DetailView):
+class FollowMixin:
+    def post(self, request, *args, **kwargs):
+        target = get_object_or_404(User, pk=self.request.POST.get("target", 0))
+        if "follow" in self.request.POST:
+            self.request.user.follow.add(target)
+        elif "unfollow" in self.request.POST:
+            self.request.user.follow.remove(target)
+        return HttpResponseRedirect(self.request.META.get("HTTP_REFERER"))
+
+
+class ProfileView(LoginRequiredMixin, FollowMixin, DetailView):
     model = User
 
     def get_queryset(self):
-        return (
+        queryset = (
             super()
             .get_queryset()
             .prefetch_related("posts", "like")
@@ -174,16 +184,16 @@ class ProfileView(LoginRequiredMixin, DetailView):
                 Count("followed", distinct=True),
             )
         )
-
-
-class FollowMixin:
-    def post(self, request, *args, **kwargs):
-        target = get_object_or_404(User, pk=self.request.POST.get("target", 0))
-        if "follow" in self.request.POST:
-            self.request.user.follow.add(target)
-        elif "unfollow" in self.request.POST:
-            self.request.user.follow.remove(target)
-        return HttpResponseRedirect(self.request.META.get("HTTP_REFERER"))
+        if self.kwargs["pk"] != self.request.user.pk:
+            queryset = queryset.annotate(
+                is_follow=Case(
+                    When(
+                        followed__id__contains=self.request.user.pk, then=True
+                    ),
+                    default=False,
+                )
+            )
+        return queryset
 
 
 class FollowListView(LoginRequiredMixin, FollowMixin, ListView):

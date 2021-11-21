@@ -28,6 +28,12 @@
         <div class="profile__setting">
             <a href="{% url 'settings' %}"><i class="fas fa-cog"></i></a>
         </div>
+        {% else %}
+        <form method="post" class="profile__setting">
+            {% csrf_token %}
+            <input type="hidden" name="target" value="{{ user.pk }}">
+            <button type="submit" name="{% if user.is_follow %}un{% endif %}follow" class="round-button round-button--narrow">フォロー{% if user.is_follow %}中{% endif %}</button>
+        </form>
         {% endif %}
     </div>
     <div>{{ user.profile|linebreaks }}</div>
