@@ -139,3 +139,8 @@ EMAIL_PORT = 587
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "index"
+
+try:
+    from .local_settings import *
+except ImportError:
+    pass

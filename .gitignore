@@ -2,6 +2,8 @@
 __pycache__/
 *.py[cdo]
 db.sqlite3
+local_settings.py
+staticfiles/
 media/
 
 .DS_Store
