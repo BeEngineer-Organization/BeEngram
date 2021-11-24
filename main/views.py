@@ -175,8 +175,8 @@ class ProfileView(LoginRequiredMixin, FollowMixin, DetailView):
 
     def get_queryset(self):
         queryset = (
-            super()
-            .get_queryset()
+            User.objects
+            .filter(pk=self.kwargs["pk"])
             .prefetch_related("posts", "like")
             .annotate(
                 Count("posts", distinct=True),
@@ -185,11 +185,10 @@ class ProfileView(LoginRequiredMixin, FollowMixin, DetailView):
             )
         )
         if self.kwargs["pk"] != self.request.user.pk:
+            follow_list = self.request.user.follow.all().values_list("id", flat=True)
             queryset = queryset.annotate(
                 is_follow=Case(
-                    When(
-                        followed__id__contains=self.request.user.pk, then=True
-                    ),
+                    When(id__in=follow_list, then=True),
                     default=False,
                 )
             )
@@ -206,13 +205,13 @@ class FollowListView(LoginRequiredMixin, FollowMixin, ListView):
             queryset = user.followed
         else:
             queryset = user.follow
+        follow_list = self.request.user.follow.all().values_list("id", flat=True)
         self.queryset = queryset.annotate(
             is_follow=Case(
-                When(followed__id__contains=self.request.user.pk, then=True),
+                When(id__in=follow_list, then=True),
                 default=False,
             )
         )
-
         return super().get_queryset()
 
     def get_context_data(self, **kwargs):
@@ -229,30 +228,32 @@ class SearchView(LoginRequiredMixin, FollowMixin, ListView):
         if form.is_valid():
             keyword = form.cleaned_data["keyword"]
             if "post" in self.request.GET:
-                self.queryset = self._search_posts(keyword)
+                queryset = self._search_posts(keyword)
             else:
-                self.queryset = self._search_users(keyword)
+                queryset = self._search_users(keyword)
         else:
             if "post" in self.request.GET:
-                self.queryset = Post.objects.none()
+                queryset = Post.objects.none()
             else:
-                self.queryset = User.objects.none()
-
-        return super().get_queryset()
+                queryset = User.objects.none()
+        return queryset
 
     def _search_posts(self, keyword):
         queryset = Post.objects.all().select_related("user")
+
         for word in keyword.split():
             queryset = queryset.filter(note__icontains=word)
         return queryset
 
     def _search_users(self, keyword):
+        follow_list = self.request.user.follow.all().values_list("id", flat=True)
         queryset = User.objects.all().annotate(
             is_follow=Case(
-                When(followed__id__contains=self.request.user.pk, then=True),
+                When(id__in=follow_list, then=True),
                 default=False,
             )
         )
+
         for word in keyword.split():
             queryset = queryset.filter(username__icontains=word)
         return queryset
