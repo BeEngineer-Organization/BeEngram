@@ -441,16 +441,12 @@ a.profile-counter {
 }
 
 .post-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
     width: 100%;
 }
 
 .post-grid__item {
+    display: block;
     padding: 4px;
-    flex: 0 0 calc(100% / 3);
 }
 
 .post-grid__item img {
