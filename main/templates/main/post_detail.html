@@ -22,7 +22,6 @@
         <div class="post__like">
             <a class="like{% if post in user.like.all %} like--active{% endif %}" data-pk="{{post.pk}}"><i class="fas fa-heart"></i></a>
         </div>
-        </div>
         <div class="post__user">
             <a href="{% url 'profile' post.user.pk %}" class="user">
                 <img src="{{ post.user.icon_url }}">
