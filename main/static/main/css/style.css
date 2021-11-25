@@ -442,6 +442,9 @@ a.profile-counter {
 
 .post-grid {
     width: 100%;
+    padding: 0;
+    margin: 0;
+    list-style: none;
 }
 
 .post-grid__item {

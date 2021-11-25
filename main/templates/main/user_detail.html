@@ -55,17 +55,21 @@
 </div>
 
 {% if 'likes' not in request.GET %}
-<div class="post-grid">
+<ul class="post-grid">
     {% for post in user.posts.all %}
-    <a href="{% url 'post_detail' post.pk %}" class="post-grid__item"><img src="{{ post.img.url }}"></a>
+    <li class="post-grid__item">
+        <a href="{% url 'post_detail' post.pk %}"><img src="{{ post.img.url }}"></a>
+    </li>
     {% endfor %}
-</div>
+</ul>
 {% else %}
-<div class="post-grid">
+<ul class="post-grid">
     {% for post in user.like.all %}
-    <a href="{% url 'post_detail' post.pk %}" class="post-grid__item"><img src="{{ post.img.url }}"></a>
+    <li class="post-grid__item">
+        <a href="{% url 'post_detail' post.pk %}"><img src="{{ post.img.url }}"></a>
+    </li>
     {% endfor %}
-</div>
+</ul>
 {% endif %}
 {% endblock %}
 
