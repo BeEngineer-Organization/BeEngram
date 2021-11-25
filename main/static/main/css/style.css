@@ -450,6 +450,9 @@ a.profile-counter {
     justify-content: center;
     align-items: center;
     width: 100%;
+    padding: 0;
+    margin: 0;
+    list-style: none;
 }
 
 .post-grid__item {
