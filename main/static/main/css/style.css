@@ -25,9 +25,9 @@ body {
     top: 0;
     font-size: 1.5em;
     color: var(--black);
-    background-color: var(--lightgray);
-    border-top: 2px solid var(--gray);
-    border-bottom: 2px solid var(--gray);
+    background-color: #cdc9ff;
+    border-top: 2px solid #6558f5;
+    border-bottom: 2px solid #6558f5;
     z-index: 1;
 }
 
