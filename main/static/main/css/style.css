@@ -260,17 +260,8 @@ body {
     margin: 0 16px;
 }
 
-.post__comment {
-    font-size: 32px;
-    margin: 0 16px;
-}
-
 .post__user {
     margin: 0 16px 0 auto;
-}
-
-.post__user:not(.post__like ~ .post__comment ~ .post__user) {
-    margin: 0;
 }
 
 .user {
@@ -291,7 +282,12 @@ body {
     line-height: 48px;
 }
 
-:is(.post__like, .post__comment, .post__user) a {
+.post__like a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.post__user a {
     color: inherit;
     text-decoration: none;
 }

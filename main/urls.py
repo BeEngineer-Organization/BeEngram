@@ -32,7 +32,6 @@ urlpatterns = [
         views.PostDeleteView.as_view(),
         name="delete_post",
     ),
-    path("comment/<int:post_pk>", views.CommentView.as_view(), name="comment"),
     path("profile/<int:pk>", views.ProfileView.as_view(), name="profile"),
     path(
         "profile/follow-list/<int:pk>",

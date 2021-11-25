@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import Comment, Post, User
+from .models import Post, User
 
 
 class SignUpForm(UserCreationForm):
@@ -24,17 +24,6 @@ class PostForm(forms.ModelForm):
             "note": forms.Textarea(
                 attrs={"placeholder": "説明文（300字以内）", "rows": 7}
             ),
-        }
-
-
-class CommentForm(forms.ModelForm):
-    class Meta:
-        model = Comment
-        fields = ("text",)
-        widgets = {
-            "text": forms.Textarea(
-                attrs={"placeholder": "コメント（150字以内）", "rows": 7}
-            )
         }
 
 
