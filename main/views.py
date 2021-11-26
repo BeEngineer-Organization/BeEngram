@@ -175,8 +175,7 @@ class ProfileView(LoginRequiredMixin, FollowMixin, DetailView):
 
     def get_queryset(self):
         queryset = (
-            User.objects
-            .filter(pk=self.kwargs["pk"])
+            User.objects.filter(pk=self.kwargs["pk"])
             .prefetch_related("posts", "like")
             .annotate(
                 Count("posts", distinct=True),
@@ -185,7 +184,9 @@ class ProfileView(LoginRequiredMixin, FollowMixin, DetailView):
             )
         )
         if self.kwargs["pk"] != self.request.user.pk:
-            follow_list = self.request.user.follow.all().values_list("id", flat=True)
+            follow_list = self.request.user.follow.all().values_list(
+                "id", flat=True
+            )
             queryset = queryset.annotate(
                 is_follow=Case(
                     When(id__in=follow_list, then=True),
@@ -198,6 +199,7 @@ class ProfileView(LoginRequiredMixin, FollowMixin, DetailView):
 class FollowListView(LoginRequiredMixin, FollowMixin, ListView):
     template_name = "main/follow_list.html"
     ordering = ("username",)
+    paginate_by = 20
 
     def get_queryset(self):
         user = get_object_or_404(User, pk=self.kwargs["pk"])
@@ -205,7 +207,9 @@ class FollowListView(LoginRequiredMixin, FollowMixin, ListView):
             queryset = user.followed
         else:
             queryset = user.follow
-        follow_list = self.request.user.follow.all().values_list("id", flat=True)
+        follow_list = self.request.user.follow.all().values_list(
+            "id", flat=True
+        )
         self.queryset = queryset.annotate(
             is_follow=Case(
                 When(id__in=follow_list, then=True),
@@ -222,6 +226,7 @@ class FollowListView(LoginRequiredMixin, FollowMixin, ListView):
 
 class SearchView(LoginRequiredMixin, FollowMixin, ListView):
     template_name = "main/search.html"
+    paginate_by = 20
 
     def get_queryset(self):
         form = SearchForm(self.request.GET)
@@ -243,10 +248,12 @@ class SearchView(LoginRequiredMixin, FollowMixin, ListView):
 
         for word in keyword.split():
             queryset = queryset.filter(note__icontains=word)
-        return queryset
+        return queryset.order_by("-post_date")
 
     def _search_users(self, keyword):
-        follow_list = self.request.user.follow.all().values_list("id", flat=True)
+        follow_list = self.request.user.follow.all().values_list(
+            "id", flat=True
+        )
         queryset = User.objects.all().annotate(
             is_follow=Case(
                 When(id__in=follow_list, then=True),
@@ -256,7 +263,7 @@ class SearchView(LoginRequiredMixin, FollowMixin, ListView):
 
         for word in keyword.split():
             queryset = queryset.filter(username__icontains=word)
-        return queryset
+        return queryset.order_by("-is_follow", "username")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

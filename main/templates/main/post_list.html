@@ -62,6 +62,7 @@
     </li>
     {% endfor %}
 </ul>
+{% include "main/pagination.html" %}
 {% endblock %}
 
 {% block footer %}{% include "main/footer.html" with has_floating_button=True %}{% endblock %}

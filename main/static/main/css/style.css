@@ -217,6 +217,10 @@ body {
     margin: 0;
 }
 
+.pagination {
+    text-align: center;
+}
+
 .post-list {
     list-style: none;
     width: 100%;
@@ -395,7 +399,6 @@ body {
 
 .profile__icon {
     display: flex;
-    justify-content: center;
     align-items: center;
 }
 
