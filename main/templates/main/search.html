@@ -91,6 +91,7 @@
     {% endfor %}
 </ul>
 {% endif %}
+{% include "main/pagination.html" %}
 {% endblock %}
 
 {% block footer %}{% include "main/footer.html" with current="search" has_floating_button=True %}{% endblock %}

@@ -37,6 +37,7 @@
     </li>
     {% endfor %}
 </ul>
+{% include "main/pagination.html" %}
 {% endblock %}
 
 {% block footer %}{% include "main/footer.html" with current="profile" %}{% endblock %}
