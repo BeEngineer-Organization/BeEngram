@@ -9,7 +9,7 @@
     <div class="form-field form-field--image">
         {{ form.img }}
         <label for="{{ form.img.id_for_label }}">
-            <img src="https://dummyimage.com/600x400/888888/ffffff">
+            <img src="{% static 'main/img/placeholder.png' %}">
         </label>
         {% if form.img.errors %}
         <ul class="form-field__errors">
