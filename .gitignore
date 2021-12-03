@@ -1,9 +1,16 @@
 .venv/
 __pycache__/
 *.py[cdo]
-db.sqlite3
+# db.sqlite3
 local_settings.py
 staticfiles/
-media/
+media/icons/*
+media/posts/*
+!media/icons/1280463_s.jpg
+!media/icons/2276028_s.jpg
+!media/icons/22676899_s.jpg
+!media/posts/3121864_s.jpg
+!media/posts/22560087_s.jpg
+!media/posts/22957190_s.jpg
 
 .DS_Store
