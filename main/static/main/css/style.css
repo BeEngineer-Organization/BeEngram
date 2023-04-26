@@ -448,11 +448,17 @@ a.profile-counter {
     padding: 0;
     margin: 0;
     list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .post-grid__item {
     display: block;
     padding: 4px;
+    flex: 0 0 auto;
+    width: calc(100% / 3);
 }
 
 .post-grid__item img {
