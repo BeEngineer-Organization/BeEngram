@@ -22,9 +22,7 @@ class User(AbstractUser):
 
 
 class Post(models.Model):
-    user = models.ForeignKey(
-        "User", on_delete=models.CASCADE, related_name="posts"
-    )
+    user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="posts")
     img = models.ImageField(upload_to="posts/")
     note = models.CharField(max_length=300, blank=True)
     post_date = models.DateTimeField(auto_now_add=True)

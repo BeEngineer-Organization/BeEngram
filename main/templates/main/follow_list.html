@@ -3,41 +3,9 @@
 
 {% block header %}
 {{ block.super }}
-<div class="header-tabs">
-    <div class="tabs tabs--2">
-        <div class="tab{% if 'followed' not in request.GET %} tab--active{% endif %}">
-            <a href="{% url 'follow_list' user_id %}" class="tab__link">
-                <span class="tab__label">フォロー</span>
-            </a>
-        </div>
-        <div class="tab{% if 'followed' in request.GET %} tab--active{% endif %}">
-            <a href="{% url 'follow_list' user_id %}?followed" class="tab__link">
-                <span class="tab__label">フォロワー</span>
-            </a>
-        </div>
-    </div>
-</div>
 {% endblock %}
 
 {% block content %}
-<ul class="user-list">
-    {% for user in object_list %}
-    <li class="user-list__item">
-        <a href="{% url 'profile' user.pk %}" class="user">
-            <img src="{{ user.icon_url }}" alt="ユーザーアイコン">
-            <span>{{ user.username }}</span>
-        </a>
-        {% if user.pk is not request.user.pk  %}
-        <form method="post">
-            {% csrf_token %}
-            <input type="hidden" name="target" value="{{ user.pk }}">
-            <button type="submit" name="{% if user.is_follow %}un{% endif %}follow" class="round-button round-button--narrow">フォロー{% if user.is_follow %}中{% endif %}</button>
-        </form>
-        {% endif %}
-    </li>
-    {% endfor %}
-</ul>
-{% include "main/pagination.html" %}
 {% endblock %}
 
 {% block footer %}{% include "main/footer.html" with current="profile" %}{% endblock %}

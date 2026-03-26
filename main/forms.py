@@ -38,9 +38,7 @@ class ProfileEditForm(forms.ModelForm):
                     "data-form-image": True,
                 }
             ),
-            "profile": forms.Textarea(
-                attrs={"placeholder": "150字以内", "rows": 7}
-            ),
+            "profile": forms.Textarea(attrs={"placeholder": "150字以内", "rows": 7}),
         }
 
 

@@ -11,7 +11,7 @@
                 <ul class="action-list">
                     <li class="action-list__item">
                         {% if post.user == user %}
-                        <a href="{% url 'delete_post' post.pk %}">削除</a>
+                        <a href="{% url 'delete_post' post.id %}">削除</a>
                         {% endif %}
                     </li>
                 </ul>
@@ -20,10 +20,10 @@
     </div>
     <div class="post__actions">
         <div class="post__like">
-            <a class="like{% if post in user.like.all %} like--active{% endif %}" data-pk="{{post.pk}}"><i class="fas fa-heart"></i></a>
+            <a class="like{% if post in user.like.all %} like--active{% endif %}" data-id="{{post.id}}"><i class="fas fa-heart"></i></a>
         </div>
         <div class="post__user">
-            <a href="{% url 'profile' post.user.pk %}" class="user">
+            <a href="" class="user">
                 <img src="{{ post.user.icon_url }}">
                 <span>{{ post.user.username }}</span>
             </a>

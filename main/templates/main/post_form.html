@@ -22,6 +22,13 @@
     <div class="form-field">
         {{ form.note }}
     </div>
+    {% if form.note.errors %}
+    <ul class="form-field__errors">
+        {% for err in form.note.errors %}
+        <li>{{ err }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
     <div class="form-field form-field--submit">
         <button type="submit" class="round-button">投稿</button>
     </div>

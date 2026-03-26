@@ -20,8 +20,8 @@
     for (let i = 0, l = likeIcons.length; i < l; ++i) {
         const icon = likeIcons[i];
         icon.addEventListener("click", function () {
-            const postPk = icon.getAttribute("data-pk");
-            url = `/like/${postPk}`;
+            const postId = icon.getAttribute("data-id");
+            url = `/like/${postId}`;
             const xhr = new XMLHttpRequest();
             xhr.open("POST", url, true);
             xhr.setRequestHeader('X-CSRFToken', csrftoken);
